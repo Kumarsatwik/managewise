@@ -4,7 +4,7 @@ const appConfig = () => ({
   NODE_ENV: getEnv("NODE_ENV", "development"),
   PORT: getEnv("PORT", "4000"),
   MONGO_URI: getEnv("MONGO_URI", ""),
-  BASE_PATH: getEnv("BASE_APTH", "/v1"),
+  BASE_PATH: getEnv("BASE_PATH", "/v1"),
 
   SESSION_SECRET: getEnv("SESSION_SECRET", ""),
   SESSION_EXPIRES_IN: getEnv("SESSION_EXPIRES_IN", ""),
@@ -16,7 +16,7 @@ const appConfig = () => ({
   FRONTEND_ORIGIN: getEnv("FRONTEND_ORIGIN", "localhost"),
   FRONTEND_GOOGLE_CALLBACK_URL: getEnv(
     "FRONTEND_GOOGLE_CALLBACK_URL",
-    "http://localhost:3000/auth/google/callback"
+    "http://localhost:5173/auth/google/callback"
   ),
 });
 
