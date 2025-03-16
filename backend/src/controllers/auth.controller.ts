@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { asyncHandler } from "../middlewares/asyncHandler.middleware";
+import { asyncHandler } from "../middlewares/asynchandler.middleware";
 import { config } from "../config/app.config";
 import { registerSchema } from "../validations/auth.validation";
 import { HTTPSTATUS } from "../config/http.config";

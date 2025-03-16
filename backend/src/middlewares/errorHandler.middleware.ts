@@ -2,7 +2,7 @@ import { ErrorRequestHandler, Response } from "express";
 import { HTTPSTATUS } from "../config/http.config";
 import { AppError } from "../utils/appError";
 import { z, ZodError } from "zod";
-import { ErrorCodeEnum } from "../enums/errorCode.enum";
+import { ErrorCodeEnum } from "../enums/errorcode.enum";
 
 const formatZodError = (res: Response, err: z.ZodError): any => {
   const errors = err?.issues?.map((issue) => {

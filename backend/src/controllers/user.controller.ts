@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { asyncHandler } from "../middlewares/asyncHandler.middleware";
+import { asyncHandler } from "../middlewares/asynchandler.middleware";
 import { HTTPSTATUS } from "../config/http.config";
 import { getCurrentUserService } from "../services/user.service";
 

@@ -4,16 +4,17 @@ import cors from "cors";
 import session from "express-session"; // Changed from cookie-session
 import { config } from "./config/app.config";
 import connectDatabase from "./config/database.config";
-import { error } from "console";
-import { errorHandler } from "./middlewares/errorHandler.middleware";
+import { errorHandler } from "./middlewares/errorhandler.middleware";
 import { HTTPSTATUS } from "./config/http.config";
-import { asyncHandler } from "./middlewares/asyncHandler.middleware";
+import { asyncHandler } from "./middlewares/asynchandler.middleware";
 import "./config/passport.config";
 import passport from "passport";
 import authRoutes from "./routes/auth.routes";
 import morgan from "morgan";
 import userRoutes from "./routes/user.routes";
-import isAuthenticated from "./middlewares/isAuthenticated.middleware";
+import isAuthenticated from "./middlewares/isauthenticated.middleware";
+import workspaceRoutes from "./routes/workspace.routes";
+import memberRoutes from "./routes/member.routes";
 const app = express();
 const BASE_PATH = config.BASE_PATH;
 console.log("BASE_PATH", BASE_PATH);
@@ -57,6 +58,8 @@ app.get(
 
 app.use(`${BASE_PATH}/auth`, authRoutes); 
 app.use(`${BASE_PATH}/user`, isAuthenticated,userRoutes);
+app.use(`${BASE_PATH}/workspace`, isAuthenticated,workspaceRoutes);
+app.use(`${BASE_PATH}/member`, isAuthenticated,memberRoutes);
 
 app.use(errorHandler);
 
