@@ -4,9 +4,10 @@ import MemberModel from "../models/member.model";
 import RoleModel from "../models/roles-permission.model";
 import User from "../models/user.models";
 import WorkspaceModel from "../models/workspace.model";
-import { NotFoundException } from "../utils/appError";
+import { BadRequestException, NotFoundException } from "../utils/appError";
 import TaskModel from "../models/task.model";
 import { TaskStatusEnum } from "../enums/task.enum";
+import ProjectModel from "../models/project.model";
 
 // create a workspace
 export const createWorkspaceService = async (
@@ -153,4 +154,56 @@ export const updateWorkspaceByIdService = async (
   await workspace.save();
 
   return { workspace };
+};
+
+export const deleteWorkspaceByIdService = async (
+  workspaceId: string,
+  userId: string
+) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const workspace = await WorkspaceModel.findByIdAndDelete(workspaceId);
+
+    if (!workspace) {
+      throw new NotFoundException("Workspace not found");
+    }
+    if (workspace.owner.toString() !== userId) {
+      throw new BadRequestException("You are not the owner of this workspace");
+    }
+    const user = await User.findById(userId).session(session);
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+    await ProjectModel.deleteMany({ workspace: workspace._id }).session(
+      session
+    );
+    await MemberModel.deleteMany({ workspaceId: workspace._id }).session(
+      session
+    );
+    await TaskModel.deleteMany({ workspace: workspace._id }).session(session);
+
+    if (user?.currentWorkspace?.equals(workspaceId)) {
+      const memberWorkspace = await MemberModel.findOne({
+        userId: userId,
+      }).session(session);
+
+      user.currentWorkspace = memberWorkspace
+        ? memberWorkspace.workspaceId
+        : null;
+      await user.save();
+    }
+    await workspace.deleteOne({ session });
+
+    await session.commitTransaction();
+
+    session.endSession();
+
+    return { currentWorkspace: user.currentWorkspace };
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
 };

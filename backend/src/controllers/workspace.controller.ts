@@ -10,6 +10,7 @@ import { HTTPSTATUS } from "../config/http.config";
 import {
   changeWorkspaceMemberRoleService,
   createWorkspaceService,
+  deleteWorkspaceByIdService,
   getAllUserWorkspacesService,
   getWorkspaceAnalyticsService,
   getWorkspaceByIdService,
@@ -148,3 +149,22 @@ export const updateWorkspaceByIdController = asyncHandler(
     });
   }
 );
+
+export const deleteWorkspaceByIdController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const workspaceId = workspaceIdSchema.parse(req.params.id);
+    const userId = req.user?._id;
+
+    const { role } = await getMemberRoleInWorkspace(userId, workspaceId);
+    roleGuard(role, [Permissions.DELETE_WORKSPACE]);
+
+    const { currentWorkspace } = await deleteWorkspaceByIdService(workspaceId,userId); 
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Workspace deleted successfully",
+      currentWorkspace,
+    });
+  }
+);
+
+
