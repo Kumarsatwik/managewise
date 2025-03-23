@@ -1,4 +1,3 @@
-import { ErrorCodeEnum } from "../enums/errorcode.enum";
 import { PermissionType } from "../enums/role.enum";
 import { UnauthorizedException } from "./appError";
 import { RolePermissions } from "./roles-permission";
