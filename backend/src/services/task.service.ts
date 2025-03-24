@@ -66,7 +66,6 @@ export const updateTaskService = async (
     dueDate?: string;
   }
 ) => {
-  const { title, description, priority, status, assignedTo, dueDate } = body;
   const project = await ProjectModel.findById(projectId);
   if (!project || project.workspace.toString() !== workspaceId.toString()) {
     throw new NotFoundException(
@@ -125,41 +124,80 @@ export const getAllTasksService = async (
     query.priority = { $in: filters.priority };
   }
 
-    if (filters.assignedTo && filters.assignedTo?.length > 0) {
-        query.assignedTo = { $in: filters.assignedTo };
-    }
+  if (filters.assignedTo && filters.assignedTo?.length > 0) {
+    query.assignedTo = { $in: filters.assignedTo };
+  }
 
   if (filters.keyword && filters.keyword.length !== undefined) {
     query.title = { $regex: filters.keyword, $options: "i" };
   }
 
-  if(filters.dueDate){
-    query.dueDate={
-        $eq: new Date(filters.dueDate)
-    }
+  if (filters.dueDate) {
+    query.dueDate = {
+      $eq: new Date(filters.dueDate),
+    };
   }
 
-  const {pageSize,pageNumber} = pagination
+  const { pageSize, pageNumber } = pagination;
   const skip = (pageNumber - 1) * pageSize;
-  const [tasks,totalCount]= await Promise.all([
+  const [tasks, totalCount] = await Promise.all([
     TaskModel.findById(query)
-    .skip(skip)
-    .limit(pageSize)
-    .sort({createdAt: -1})
-    .populate("assignedTo", "_id name displayName -password")
-    .populate("project","_id emoji name"),
-    TaskModel.countDocuments(query)
-  ])
+      .skip(skip)
+      .limit(pageSize)
+      .sort({ createdAt: -1 })
+      .populate("assignedTo", "_id name displayName -password")
+      .populate("project", "_id emoji name"),
+    TaskModel.countDocuments(query),
+  ]);
 
-  const totalPages = Math.ceil(totalCount / pageSize)
+  const totalPages = Math.ceil(totalCount / pageSize);
   return {
     tasks,
-    pagination:{
-        pageSize,
-        pageNumber,
-        totalCount,
-        totalPages,
-        skip
-    }
+    pagination: {
+      pageSize,
+      pageNumber,
+      totalCount,
+      totalPages,
+      skip,
+    },
+  };
+};
+
+export const getTaskByIdService = async (
+  workspaceId: string,
+  projectId: string,
+  taskId: string
+) => {
+  const project = await ProjectModel.findById(projectId);
+  if (!project || project.workspace.toString() !== workspaceId.toString()) {
+    throw new NotFoundException(
+      "Project not found or does not belong to this workspace"
+    );
   }
+  const task = await TaskModel.findOne({
+    _id: taskId,
+    workspace: workspaceId,
+    project: projectId,
+  }).populate("assignedTo", "_id name profilePicture -password");
+
+  if (!task) {
+    throw new Error("Task not found");
+  }
+  return task;
+};
+
+export const deleteTaskService = async (
+  workspaceId: string,
+  taskId: string
+) => {
+  const task = await TaskModel.findOneAndDelete({
+    _id: taskId,
+    workspace: workspaceId,
+  });
+  if (!task) {
+    throw new NotFoundException(
+      "Task not found or does not belong to this project"
+    );
+  }
+  return;
 };

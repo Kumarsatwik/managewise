@@ -11,7 +11,9 @@ import { roleGuard } from "../utils/roleguard";
 import { Permissions } from "../enums/role.enum";
 import {
   createTaskService,
+  deleteTaskService,
   getAllTasksService,
+  getTaskByIdService,
   updateTaskService,
 } from "../services/task.service";
 import { HTTPSTATUS } from "../config/http.config";
@@ -66,10 +68,6 @@ export const updateTasksController = asyncHandler(
   }
 );
 
-export const deleteTasksController = asyncHandler(
-  async (req: Request, res: Response) => {}
-);
-
 export const getAllTasksController = asyncHandler(
   async (req: Request, res: Response) => {
     const userId = req.user?._id;
@@ -105,5 +103,36 @@ export const getAllTasksController = asyncHandler(
 );
 
 export const getTaskByIdController = asyncHandler(
-  async (req: Request, res: Response) => {}
+  async (req: Request, res: Response) => {
+    const projectId = projectIdSchema.parse(req.params.projectId);
+    const workspaceId = projectIdSchema.parse(req.params.workspaceId);
+    const userId = req.user?._id;
+    const taskId = taskIdSchema.parse(req.params.id);
+
+    const { role } = await getMemberRoleInWorkspace(userId, workspaceId);
+    roleGuard(role, [Permissions.VIEW_ONLY]);
+
+    const task = await getTaskByIdService(workspaceId, projectId, taskId);
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Task fetched successfully",
+      task,
+    });
+  }
+);
+
+export const deleteTasksController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?._id;
+    const workspaceId = workspaceIdSchema.parse(req.params.workspaceId);
+    const taskId = taskIdSchema.parse(req.params.id);
+
+    const { role } = await getMemberRoleInWorkspace(userId, workspaceId);
+    roleGuard(role, [Permissions.VIEW_ONLY]);
+
+    await deleteTaskService(workspaceId, taskId);
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Task deleted successfully",
+    });
+  }
 );
