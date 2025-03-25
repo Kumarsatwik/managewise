@@ -17,7 +17,7 @@ export const googleLoginCallback = asyncHandler(
       );
     }
     return res.redirect(
-      `${config.FRONTEND_ORIGIN}/workspaces/${currentWorkspace}`
+      `${config.FRONTEND_ORIGIN}/workspace/${currentWorkspace}`
     );
   }
 );
