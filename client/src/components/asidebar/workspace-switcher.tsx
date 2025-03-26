@@ -49,7 +49,7 @@ export function WorkspaceSwitcher() {
   React.useEffect(() => {
     if (workspaces?.length) {
       const workspace = workspaceId
-        ? workspaces.find((w) => w._id === workspaceId)
+        ? workspaces.find((w) => w?._id === workspaceId)
         : workspaces[0];
       if (workspace) {
         setActiveWorkspace(workspace);
@@ -119,16 +119,16 @@ export function WorkspaceSwitcher() {
               {isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
               {workspaces?.map((workspace) => (
                 <DropdownMenuItem
-                  key={workspace._id}
+                  key={workspace?._id}
                   onClick={() => onSelect(workspace)}
                   className="gap-2 p-2 !cursor-pointer"
                 >
                   <div className="flex size-6 items-center justify-center rounded-sm border">
                     {workspace?.name?.split(" ")?.[0]?.charAt(0)}
                   </div>
-                  {workspace.name}
+                  {workspace?.name}
 
-                  {workspace._id === workspaceId && (
+                  {workspace?._id === workspaceId && (
                     <DropdownMenuShortcut className="tracking-normal !opacity-100">
                       <Check className="w-4 h-4" />
                     </DropdownMenuShortcut>
