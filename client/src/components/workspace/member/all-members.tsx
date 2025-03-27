@@ -23,8 +23,10 @@ import useGetWorkspaceMembers from "@/hooks/api/use-get-workspace-members";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { changeWorkspaceMemberRoleMutationFn } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
+import { Permissions } from "@/constant";
 const AllMembers = () => {
-  const { user } = useAuthContext();
+  const { user, hasPermission } = useAuthContext();
+  const canChangeMemberRole = hasPermission(Permissions.CHANGE_MEMBER_ROLE);
 
   const workspaceId = useWorkspaceId();
   const queryClient = useQueryClient();
@@ -100,59 +102,67 @@ const AllMembers = () => {
                     variant="outline"
                     size="sm"
                     className="ml-auto min-w-24 capitalize disabled:opacity-95 disabled:pointer-events-none"
+                    disabled={
+                      !canChangeMemberRole ||
+                      isLoading ||
+                      member.userId._id === user?._id
+                    }
                   >
                     {member.role.name?.toLowerCase()}{" "}
-                    {member.userId?._id === user?._id && (
-                      <ChevronDown className="text-muted-foreground" />
-                    )}
+                    {canChangeMemberRole &&
+                      member.userId?._id === user?._id && (
+                        <ChevronDown className="text-muted-foreground" />
+                      )}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="p-0" align="end">
-                  <Command>
-                    <CommandInput
-                      className="disabled:pointer-events-none"
-                      disabled={isLoading}
-                      placeholder="Select new role..."
-                    />
-                    <CommandList>
-                      {isPending ? (
-                        <Loader className="w-8 h-8 animate-spin place-self-center flex my-4" />
-                      ) : (
-                        <>
-                          <CommandEmpty>No roles found.</CommandEmpty>
-                          <CommandGroup>
-                            {roles?.map(
-                              (role) =>
-                                role.name !== "OWNER" && (
-                                  <CommandItem
-                                    key={role._id}
-                                    disabled={isPending}
-                                    className="disabled:pointer-events-none gap-1 mb-1 cursor-pointer flex flex-col items-start px-4 py-2"
-                                    onSelect={() => {
-                                      handleSelect(
-                                        role._id,
-                                        member.userId?._id
-                                      );
-                                    }}
-                                  >
-                                    <p className="capitalize">
-                                      {role.name?.toLowerCase()}
-                                    </p>
-                                    <p className="text-sm text-muted-foreground">
-                                      {role.name === "ADMIN" &&
-                                        "Can view, create, edit tasks, project and manage settings."}
-                                      {role.name === "MEMBER" &&
-                                        "Can view and edit only tasks they created."}
-                                    </p>
-                                  </CommandItem>
-                                )
-                            )}
-                          </CommandGroup>
-                        </>
-                      )}
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
+                {canChangeMemberRole && (
+                  <PopoverContent className="p-0" align="end">
+                    <Command>
+                      <CommandInput
+                        className="disabled:pointer-events-none"
+                        disabled={isLoading}
+                        placeholder="Select new role..."
+                      />
+                      <CommandList>
+                        {isPending ? (
+                          <Loader className="w-8 h-8 animate-spin place-self-center flex my-4" />
+                        ) : (
+                          <>
+                            <CommandEmpty>No roles found.</CommandEmpty>
+                            <CommandGroup>
+                              {roles?.map(
+                                (role) =>
+                                  role.name !== "OWNER" && (
+                                    <CommandItem
+                                      key={role._id}
+                                      disabled={isPending}
+                                      className="disabled:pointer-events-none gap-1 mb-1 cursor-pointer flex flex-col items-start px-4 py-2"
+                                      onSelect={() => {
+                                        handleSelect(
+                                          role._id,
+                                          member.userId?._id
+                                        );
+                                      }}
+                                    >
+                                      <p className="capitalize">
+                                        {role.name?.toLowerCase()}
+                                      </p>
+                                      <p className="text-sm text-muted-foreground">
+                                        {role.name === "ADMIN" &&
+                                          "Can view, create, edit tasks, project and manage settings."}
+                                        {role.name === "MEMBER" &&
+                                          "Can view and edit only tasks they created."}
+                                      </p>
+                                    </CommandItem>
+                                  )
+                              )}
+                            </CommandGroup>
+                          </>
+                        )}
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                )}
               </Popover>
             </div>
           </div>

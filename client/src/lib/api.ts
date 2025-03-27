@@ -81,7 +81,7 @@ export const getMembersInWorkspaceQueryFn = async (
 };
 
 export const changeWorkspaceMemberRoleMutationFn = async ({workspaceId,data}:ChangeWorkspaceMemberRoleType) => {
-  const response = await API.put(`/workspace/change/members/role/${workspaceId}`,data);
+  const response = await API.put(`/workspace/change/member/role/${workspaceId}`,data);
   return response.data;
 };
 
