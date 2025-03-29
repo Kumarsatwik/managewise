@@ -141,7 +141,7 @@ export const getAllTasksService = async (
   const { pageSize, pageNumber } = pagination;
   const skip = (pageNumber - 1) * pageSize;
   const [tasks, totalCount] = await Promise.all([
-    TaskModel.findById(query)
+    TaskModel.find(query)
       .skip(skip)
       .limit(pageSize)
       .sort({ createdAt: -1 })
@@ -169,12 +169,14 @@ export const getTaskByIdService = async (
   taskId: string
 ) => {
   const project = await ProjectModel.findById(projectId);
+
   if (!project || project.workspace.toString() !== workspaceId.toString()) {
     throw new NotFoundException(
       "Project not found or does not belong to this workspace"
     );
   }
-  const task = await TaskModel.findOne({
+
+  const task = await TaskModel.find({
     _id: taskId,
     workspace: workspaceId,
     project: projectId,
