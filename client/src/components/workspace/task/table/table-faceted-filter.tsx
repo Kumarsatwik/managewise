@@ -50,6 +50,7 @@ export function DataTableFacetedFilter({
     setOpen(false);
   };
 
+
   return (
     <Popover modal={true} open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>

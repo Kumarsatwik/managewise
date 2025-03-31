@@ -155,6 +155,7 @@ export default function CreateTaskForm(props: {
         dueDate: values.dueDate.toISOString(),
       },
     };
+    console.log("payload", payload);
     mutate(payload, {
       onSuccess: (data) => {
         queryClient.invalidateQueries({
@@ -163,7 +164,6 @@ export default function CreateTaskForm(props: {
         queryClient.invalidateQueries({
           queryKey: ["all-tasks", workspaceId],
         });
-        
 
         toast({
           title: "Success ",
@@ -307,13 +307,13 @@ export default function CreateTaskForm(props: {
                       </FormControl>
                       <SelectContent>
                         <div className="w-full max-h-[200px] overflow-y-auto scrollbar">
-                          {memberOptions?.map((member) => (
+                          {memberOptions?.map((option) => (
                             <SelectItem
-                              key={member.value}
-                              value={member.value}
-                              className="!capitalize"
+                              key={option.value}
+                              value={option.value}
+                              className="cursor-pointer"
                             >
-                              {member.label}
+                              {option.label}
                             </SelectItem>
                           ))}
                         </div>

@@ -24,14 +24,14 @@ export const dueDateSchema = z
     { message: "Invalid date format. Please provide a valid date" }
   );
 
-export const taskIdSchema = z.string().trim().min(1)
-
+export const taskIdSchema = z.string().trim().min(1);
 
 export const createTaskSchema = z.object({
   title: titleSchema,
   description: descriptionSchema,
   priority: prioritySchema,
   status: statusSchema,
+  assignedTo: assignedToSchema,
   dueDate: dueDateSchema,
 });
 

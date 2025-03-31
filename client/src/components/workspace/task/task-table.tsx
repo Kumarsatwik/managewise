@@ -109,7 +109,6 @@ const DataTableFilterToolbar: FC<DataTableFilterToolbarProps> = ({
 
   const { data } = useGetProjectsInWorkspaceQuery({
     workspaceId,
-    skip: !!projectId,
   });
 
   const { data: memberData } = useGetWorkspaceMembers(workspaceId);
@@ -135,14 +134,12 @@ const DataTableFilterToolbar: FC<DataTableFilterToolbarProps> = ({
     const name = member.userId?.name || "Unknown";
     const initials = getAvatarFallbackText(name);
     const avatarColor = getAvatarColor(name);
+
     return {
       label: (
         <div className="flex items-center space-x-2">
           <Avatar className="h-7 w-7">
-            <AvatarImage
-              src={member.userId?.profilePicture || ""}
-              alt="Avatar"
-            />
+            <AvatarImage src={member.userId?.profilePicture || ""} alt={name} />
             <AvatarFallback className={avatarColor}>{initials}</AvatarFallback>
           </Avatar>
           <span>{name}</span>

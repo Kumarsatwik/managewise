@@ -145,12 +145,13 @@ export const getAllTasksService = async (
       .skip(skip)
       .limit(pageSize)
       .sort({ createdAt: -1 })
-      .populate("assignedTo", "_id name displayName -password")
+      .populate("assignedTo", "_id name profilePicture -password")
       .populate("project", "_id emoji name"),
     TaskModel.countDocuments(query),
   ]);
 
   const totalPages = Math.ceil(totalCount / pageSize);
+
   return {
     tasks,
     pagination: {
