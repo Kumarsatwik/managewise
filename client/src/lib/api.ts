@@ -181,7 +181,7 @@ export const deleteProjectMutationFn = async ({
   const response = await API.delete(
     `/project/${projectId}/workspace/${workspaceId}/delete`
   );
-  return response.data;
+  return response.data; 
 };
 
 //*******TASKS ********************************

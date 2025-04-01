@@ -24,19 +24,17 @@ import GoogleOauthButton from "@/components/auth/google-oauth-button";
 import { useMutation } from "@tanstack/react-query";
 import { loginMutationFn } from "@/lib/api";
 import { Loader2 } from "lucide-react";
+import { useStore } from "@/store/store";
 
 const SignIn = () => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const returnUrl = searchParams.get("returnUrl");
+  const { setAccessToken } = useStore();
 
-  const navigate = useNavigate()
-  const [searchParams]=useSearchParams()
-  const returnUrl = searchParams.get("returnUrl")
-
-  const {mutate,isPending}=useMutation({
-    mutationFn:loginMutationFn
+  const { mutate, isPending } = useMutation({
+    mutationFn: loginMutationFn,
   });
-
-
-
 
   const formSchema = z.object({
     email: z.string().trim().email("Invalid email address").min(1, {
@@ -56,20 +54,22 @@ const SignIn = () => {
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    if(isPending) return;
-    mutate(values,{
-      onSuccess:(data)=>{
+    if (isPending) return;
+    mutate(values, {
+      onSuccess: (data) => {
+        const accessToken = data.access_token;
         const user = data.user;
-        const decodedUrl = returnUrl ? decodeURIComponent(returnUrl) : `/workspace/${user.currentWorkspace}`
-        navigate(decodedUrl || `/workspace/${user.currentWorkspace}`)
+        setAccessToken(accessToken);
+        const decodedUrl = returnUrl
+          ? decodeURIComponent(returnUrl)
+          : `/workspace/${user.currentWorkspace}`;
+        navigate(decodedUrl || `/workspace/${user.currentWorkspace}`);
       },
-      onError:(error)=>{
-        console.log(error)
-      }
-    })
+      onError: (error) => {
+        console.log(error);
+      },
+    });
   };
-
-  
 
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">
@@ -154,8 +154,13 @@ const SignIn = () => {
                           )}
                         />
                       </div>
-                      <Button type="submit" className="w-full" disabled={isPending}>
-                        {isPending && <Loader2 className="animate-spin"/>} Login
+                      <Button
+                        type="submit"
+                        className="w-full"
+                        disabled={isPending}
+                      >
+                        {isPending && <Loader2 className="animate-spin" />}{" "}
+                        Login
                       </Button>
                     </div>
                     <div className="text-center text-sm">

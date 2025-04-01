@@ -2,7 +2,11 @@ import mongoose from "mongoose";
 import User from "../models/user.models";
 import AccountModel from "../models/account.models";
 import WorkspaceModel from "../models/workspace.model";
-import { BadRequestException, NotFoundException, UnauthorizedException } from "../utils/appError";
+import {
+  BadRequestException,
+  NotFoundException,
+  UnauthorizedException,
+} from "../utils/appError";
 import RoleModel from "../models/roles-permission.model";
 import MemberModel from "../models/member.model";
 import { ProviderEnum } from "../enums/account.provider.enum";
@@ -130,8 +134,7 @@ export const registerUserService = async (body: {
     await user.save({ session });
 
     await session.commitTransaction();
-    return { userId:user._id, workspaceId:workspace._id };
-    
+    return { userId: user._id, workspaceId: workspace._id };
   } catch (err) {
     await session.abortTransaction();
     session.endSession();
@@ -141,13 +144,15 @@ export const registerUserService = async (body: {
   }
 };
 
-
-export const verifyUserService = async ({email,password,provider = ProviderEnum.EMAIL}: {
+export const verifyUserService = async ({
+  email,
+  password,
+  provider = ProviderEnum.EMAIL,
+}: {
   email: string;
   password: string;
   provider?: string;
 }) => {
-
   const account = await AccountModel.findOne({ providerId: email, provider });
   if (!account) {
     throw new NotFoundException("User not found");
@@ -161,5 +166,11 @@ export const verifyUserService = async ({email,password,provider = ProviderEnum.
     throw new UnauthorizedException("Invalid email or password ");
   }
   return user.omitPassword();
+};
 
-}
+export const findUserByIdService = async (userId: string) => {
+  const user = await User.findById(userId, {
+    password: false,
+  });
+  return user || null;
+};
