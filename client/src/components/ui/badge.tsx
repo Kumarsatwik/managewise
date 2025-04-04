@@ -1,4 +1,3 @@
-import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
@@ -22,7 +21,6 @@ const badgeVariants = cva(
         [TaskStatusEnum.IN_REVIEW]: "bg-purple-100 text-purple-500",
         [TaskStatusEnum.DONE]: "bg-green-100 text-green-600",
         [TaskPriorityEnum.HIGH]: "bg-orange-100 text-orange-600",
-        [TaskPriorityEnum.URGENT]: "bg-red-100 text-red-600",
         [TaskPriorityEnum.MEDIUM]: "bg-yellow-100 text-yellow-600",
         [TaskPriorityEnum.LOW]: "bg-gray-100 text-gray-600",
       },
